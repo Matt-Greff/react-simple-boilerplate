@@ -1,26 +1,14 @@
 import React, {Component} from 'react';
 import MessageList from './MessageList.jsx';
 import ChatBar from './ChatBar.jsx';
+var messSock = new WebSocket('ws://localhost:3001', 'connection');
 
 class App extends Component {
   constructor (props){
     super(props);
     this.state = {
-      currentUser: {name: 'Bob'}, // optional. if currentUser is not defined, it means the user is Anonymous
-          messages: [
-              {
-                  username: 'Bob',
-                  content: 'Has anyone seen my marbles?',
-              },
-              {
-                  username: 'Anonymous',
-                  content: 'No, I think you lost them. You lost your marbles Bob. You lost them for good.'
-              },
-              {
-                  username: 'Anonymous1',
-                  content: 'changed their name to nomnom.'
-              }
-          ]
+      currentUser: {name: 'anonymous'}, // optional. if currentUser is not defined, it means the user is Anonymous
+          messages: []
       };
       this.onSubmit = this.onSubmit.bind(this);
   }
@@ -28,22 +16,37 @@ class App extends Component {
     e.preventDefault();
     const username = e.target.username.value;
     const content = e.target.content.value;
-    const newMessage = {id: 3, username: username, content: content};
-    const messages = this.state.messages.concat(newMessage);
-    this.setState({messages: messages});
+    
+    messSock.send(
+      JSON.stringify({//double qoutes needed for JSON
+        "username": username,
+        "content" : content
+      })
+    );
+    e.target.content.value = '';
   }
   componentDidMount() {
-    console.log("componentDidMount <App />");
-      
+    console.log('componentDidMount <App />');
+    messSock.onopen = () => {
+    };
+    messSock.onmessage = (ev) => {
+      const newMessage = JSON.parse(ev.data);
+      const userCount = newMessage.userCount;
+      if(userCount) this.setState({userCount})
+      const messages = this.state.messages.concat(newMessage);
+      this.setState({
+        messages
+      });
     }
+  }
   render() {
-
+    
     return (
       <div>
-        <nav className="navbar">
-          <a href="/" className="navbar-brand">Chatty</a>
+        <nav className='navbar'>
+          <a href='/' className='navbar-brand'>Chatty</a><h2><strong>{this.state.userCount}</strong> users online</h2>
         </nav>
-        <MessageList messages={this.state.messages} />
+        <MessageList userColor={this.state.userColor} messages={this.state.messages} />
         <ChatBar currentUser={this.state.currentUser} onSubmit={this.onSubmit}/>  
       </div>
     );
