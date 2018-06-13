@@ -40,7 +40,7 @@ wss.on('connection', (ws) => {
       username,
       content
     } = JSON.parse(message)
-    const check = oldName === 'anonymous' && oldName === username;
+    const check = oldName === username;
     if(!check) {
       const notification = `${oldName} changed their handle to ${username}`
       const notify = JSON.stringify({
