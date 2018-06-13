@@ -3,6 +3,8 @@
 
 A one page chatroom that uses websockets and react.
 
+![alt text](https://github.com/Matt-Greff/react-simple-boilerplate/blob/master/docs/demo-image.png?raw=true)
+
 ### Setup
 
 Install the dependencies and start the server.
